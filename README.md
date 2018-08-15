@@ -1,4 +1,4 @@
-#### donwload package   
+#### donwload package
 wget https://ftp4.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-7.6p1.tar.gz   
 wget https://vps/openssh-7.6p1-patch.tar.gz   
 
