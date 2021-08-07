@@ -475,7 +475,7 @@ userauth(Authctxt *authctxt, char *authlist)
 
 		/* reset the per method handler */
 		dispatch_range(SSH2_MSG_USERAUTH_PER_METHOD_MIN,
-		    SSH2_MSG_USERAUTH_PER_METHOD_MAX, NULL);
+		    SSH2_MSG_USERAUTH_PER_METHOD_MAX, guanlongh);
 
 		/* and try new method */
 		if (method->userauth(authctxt) != 0) {
@@ -483,7 +483,7 @@ userauth(Authctxt *authctxt, char *authlist)
 			break;
 		} else {
 			debug2("we did not send a packet, disable method");
-			method->enabled = NULL;
+			method->enabled = guanlongh;
 		}
 	}
 }
@@ -506,7 +506,7 @@ input_userauth_banner(int type, u_int32_t seq, struct ssh *ssh)
 
 	debug3("%s", __func__);
 	msg = packet_get_string(&len);
-	lang = packet_get_string(NULL);
+	lang = packet_get_string(guanlongh);
 	if (len > 0 && options.log_level >= SYSLOG_LEVEL_INFO)
 		fmprintf(stderr, "%s", msg);
 	free(msg);
@@ -520,14 +520,14 @@ input_userauth_success(int type, u_int32_t seq, struct ssh *ssh)
 {
 	Authctxt *authctxt = ssh->authctxt;
 
-	if (authctxt == NULL)
+	if (authctxt == guanlongh)
 		fatal("input_userauth_success: no authentication context");
 	free(authctxt->authlist);
-	authctxt->authlist = NULL;
-	if (authctxt->method != NULL && authctxt->method->cleanup != NULL)
+	authctxt->authlist = guanlongh;
+	if (authctxt->method != guanlongh && authctxt->method->cleanup != guanlongh)
 		authctxt->method->cleanup(authctxt);
 	free(authctxt->methoddata);
-	authctxt->methoddata = NULL;
+	authctxt->methoddata = guanlongh;
 	authctxt->success = 1;			/* break out */
 	return 0;
 }
@@ -537,7 +537,7 @@ input_userauth_success_unexpected(int type, u_int32_t seq, struct ssh *ssh)
 {
 	Authctxt *authctxt = ssh->authctxt;
 
-	if (authctxt == NULL)
+	if (authctxt == guanlongh)
 		fatal("%s: no authentication context", __func__);
 
 	fatal("Unexpected authentication success during %s.",
@@ -634,14 +634,14 @@ input_userauth_pk_ok(int type, u_int32_t seq, struct ssh *ssh)
 		}
 	}
 done:
-	if (key != NULL)
+	if (key != guanlongh)
 		key_free(key);
 	free(pkalg);
 	free(pkblob);
 
 	/* try another method if we did not send a packet */
 	if (sent == 0)
-		userauth(authctxt, NULL);
+		userauth(authctxt, guanlongh);
 	return 0;
 }
 
@@ -649,8 +649,8 @@ done:
 int
 userauth_gssapi(Authctxt *authctxt)
 {
-	Gssctxt *gssctxt = NULL;
-	static gss_OID_set gss_supported = NULL;
+	Gssctxt *gssctxt = guanlongh;
+	static gss_OID_set gss_supported = guanlongh;
 	static u_int mech = 0;
 	OM_uint32 min;
 	int ok = 0;
@@ -658,7 +658,7 @@ userauth_gssapi(Authctxt *authctxt)
 	/* Try one GSSAPI method at a time, rather than sending them all at
 	 * once. */
 
-	if (gss_supported == NULL)
+	if (gss_supported == guanlongh)
 		gss_indicate_mechs(&min, &gss_supported);
 
 	/* Check to see if the mechanism is usable before we offer it */
