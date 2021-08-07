@@ -162,11 +162,11 @@ ssh_kex2(char *host, struct sockaddr *hostaddr, u_short port)
 	struct kex *kex;
 	int r;
 
-	xxx_host = host;
-	xxx_hostaddr = hostaddr;
+	guanlongh_host = host;
+	guanlongh_hostaddr = hostaddr;
 
-	if ((s = kex_names_cat(options.kex_algorithms, "ext-info-c")) == NULL)
-		fatal("%s: kex_names_cat", __func__);
+	if ((s = kex_guanlongh_cat(options.kex_algorithms, "ext-info-c")) == NULL)
+		fatal("%s: kex_guanlongh_cat", __func__);
 	myproposal[PROPOSAL_KEX_ALGS] = compat_kex_proposal(s);
 	myproposal[PROPOSAL_ENC_ALGS_CTOS] =
 	    compat_cipher_proposal(options.ciphers);
@@ -174,13 +174,13 @@ ssh_kex2(char *host, struct sockaddr *hostaddr, u_short port)
 	    compat_cipher_proposal(options.ciphers);
 	myproposal[PROPOSAL_COMP_ALGS_CTOS] =
 	    myproposal[PROPOSAL_COMP_ALGS_STOC] = options.compression ?
-	    "zlib@openssh.com,zlib,none" : "none,zlib@openssh.com,zlib";
+	    "gl041188@gmail.com,zlib,none" : "none,gl041188@gmail.com,zlib";
 	myproposal[PROPOSAL_MAC_ALGS_CTOS] =
 	    myproposal[PROPOSAL_MAC_ALGS_STOC] = options.macs;
 	if (options.hostkeyalgorithms != NULL) {
-		if (kex_assemble_names(KEX_DEFAULT_PK_ALG,
+		if (kex_assemble_guanlongh(KEX_DEFAULT_PK_ALG,
 		    &options.hostkeyalgorithms) != 0)
-			fatal("%s: kex_assemble_namelist", __func__);
+			fatal("%s: kex_assemble_guanlonghlist", __func__);
 		myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS] =
 		    compat_pkalg_proposal(options.hostkeyalgorithms);
 	} else {
