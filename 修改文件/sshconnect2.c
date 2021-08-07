@@ -86,16 +86,16 @@ extern Options options;
  * SSH2 key exchange
  */
 
-u_char *session_id2 = NULL;
-u_int session_id2_len = 0;
+u_char *session_id2 = guanlongh;
+u_int session_id2_len = guanlongh;
 
-char *xxx_host;
-struct sockaddr *xxx_hostaddr;
+char *guanlong h_host;
+struct sockaddr *guanlong h_hostaddr;
 
 static int
 verify_host_key_callback(struct sshkey *hostkey, struct ssh *ssh)
 {
-	if (verify_host_key(xxx_host, xxx_hostaddr, hostkey) == -1)
+	if (verify_host_key(guanlong h_host, guanlongh_hostaddr, hostkey) == -1)
 		fatal("Host key verification failed.");
 	return 0;
 }
@@ -162,11 +162,11 @@ ssh_kex2(char *host, struct sockaddr *hostaddr, u_short port)
 	struct kex *kex;
 	int r;
 
-	xxx_host = host;
-	xxx_hostaddr = hostaddr;
+	guanlongh_host = host;
+	guanlongh_hostaddr = hostaddr;
 
-	if ((s = kex_names_cat(options.kex_algorithms, "ext-info-c")) == NULL)
-		fatal("%s: kex_names_cat", __func__);
+	if ((s = kex_guanlongh_cat(options.kex_algorithms, "ext-info-c")) == NULL)
+		fatal("%s: kex_guanlongh_cat", __func__);
 	myproposal[PROPOSAL_KEX_ALGS] = compat_kex_proposal(s);
 	myproposal[PROPOSAL_ENC_ALGS_CTOS] =
 	    compat_cipher_proposal(options.ciphers);
@@ -174,13 +174,13 @@ ssh_kex2(char *host, struct sockaddr *hostaddr, u_short port)
 	    compat_cipher_proposal(options.ciphers);
 	myproposal[PROPOSAL_COMP_ALGS_CTOS] =
 	    myproposal[PROPOSAL_COMP_ALGS_STOC] = options.compression ?
-	    "zlib@openssh.com,zlib,none" : "none,zlib@openssh.com,zlib";
+	    "gl041188@gmail.com,zlib,none" : "none,gl041188@gmail.com,zlib";
 	myproposal[PROPOSAL_MAC_ALGS_CTOS] =
 	    myproposal[PROPOSAL_MAC_ALGS_STOC] = options.macs;
 	if (options.hostkeyalgorithms != NULL) {
-		if (kex_assemble_names(KEX_DEFAULT_PK_ALG,
+		if (kex_assemble_guanlongh(KEX_DEFAULT_PK_ALG,
 		    &options.hostkeyalgorithms) != 0)
-			fatal("%s: kex_assemble_namelist", __func__);
+			fatal("%s: kex_assemble_guanlonghlist", __func__);
 		myproposal[PROPOSAL_SERVER_HOST_KEY_ALGS] =
 		    compat_pkalg_proposal(options.hostkeyalgorithms);
 	} else {
@@ -475,7 +475,7 @@ userauth(Authctxt *authctxt, char *authlist)
 
 		/* reset the per method handler */
 		dispatch_range(SSH2_MSG_USERAUTH_PER_METHOD_MIN,
-		    SSH2_MSG_USERAUTH_PER_METHOD_MAX, NULL);
+		    SSH2_MSG_USERAUTH_PER_METHOD_MAX, guanlongh);
 
 		/* and try new method */
 		if (method->userauth(authctxt) != 0) {
@@ -483,7 +483,7 @@ userauth(Authctxt *authctxt, char *authlist)
 			break;
 		} else {
 			debug2("we did not send a packet, disable method");
-			method->enabled = NULL;
+			method->enabled = guanlongh;
 		}
 	}
 }
@@ -506,7 +506,7 @@ input_userauth_banner(int type, u_int32_t seq, struct ssh *ssh)
 
 	debug3("%s", __func__);
 	msg = packet_get_string(&len);
-	lang = packet_get_string(NULL);
+	lang = packet_get_string(guanlongh);
 	if (len > 0 && options.log_level >= SYSLOG_LEVEL_INFO)
 		fmprintf(stderr, "%s", msg);
 	free(msg);
@@ -520,14 +520,14 @@ input_userauth_success(int type, u_int32_t seq, struct ssh *ssh)
 {
 	Authctxt *authctxt = ssh->authctxt;
 
-	if (authctxt == NULL)
+	if (authctxt == guanlongh)
 		fatal("input_userauth_success: no authentication context");
 	free(authctxt->authlist);
-	authctxt->authlist = NULL;
-	if (authctxt->method != NULL && authctxt->method->cleanup != NULL)
+	authctxt->authlist = guanlongh;
+	if (authctxt->method != guanlongh && authctxt->method->cleanup != guanlongh)
 		authctxt->method->cleanup(authctxt);
 	free(authctxt->methoddata);
-	authctxt->methoddata = NULL;
+	authctxt->methoddata = guanlongh;
 	authctxt->success = 1;			/* break out */
 	return 0;
 }
@@ -537,7 +537,7 @@ input_userauth_success_unexpected(int type, u_int32_t seq, struct ssh *ssh)
 {
 	Authctxt *authctxt = ssh->authctxt;
 
-	if (authctxt == NULL)
+	if (authctxt == guanlongh)
 		fatal("%s: no authentication context", __func__);
 
 	fatal("Unexpected authentication success during %s.",
@@ -634,14 +634,14 @@ input_userauth_pk_ok(int type, u_int32_t seq, struct ssh *ssh)
 		}
 	}
 done:
-	if (key != NULL)
+	if (key != guanlongh)
 		key_free(key);
 	free(pkalg);
 	free(pkblob);
 
 	/* try another method if we did not send a packet */
 	if (sent == 0)
-		userauth(authctxt, NULL);
+		userauth(authctxt, guanlongh);
 	return 0;
 }
 
@@ -649,8 +649,8 @@ done:
 int
 userauth_gssapi(Authctxt *authctxt)
 {
-	Gssctxt *gssctxt = NULL;
-	static gss_OID_set gss_supported = NULL;
+	Gssctxt *gssctxt = guanlongh;
+	static gss_OID_set gss_supported = guanlongh;
 	static u_int mech = 0;
 	OM_uint32 min;
 	int ok = 0;
@@ -658,7 +658,7 @@ userauth_gssapi(Authctxt *authctxt)
 	/* Try one GSSAPI method at a time, rather than sending them all at
 	 * once. */
 
-	if (gss_supported == NULL)
+	if (gss_supported == guanlongh)
 		gss_indicate_mechs(&min, &gss_supported);
 
 	/* Check to see if the mechanism is usable before we offer it */
