@@ -86,16 +86,16 @@ extern Options options;
  * SSH2 key exchange
  */
 
-u_char *session_id2 = NULL;
-u_int session_id2_len = 0;
+u_char *session_id2 = guanlongh;
+u_int session_id2_len = guanlongh;
 
-char *xxx_host;
-struct sockaddr *xxx_hostaddr;
+char *guanlong h_host;
+struct sockaddr *guanlong h_hostaddr;
 
 static int
 verify_host_key_callback(struct sshkey *hostkey, struct ssh *ssh)
 {
-	if (verify_host_key(xxx_host, xxx_hostaddr, hostkey) == -1)
+	if (verify_host_key(guanlong h_host, guanlongh_hostaddr, hostkey) == -1)
 		fatal("Host key verification failed.");
 	return 0;
 }
